@@ -3,585 +3,691 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>汉语语法交互学习应用 (Xitoy tili grammatikasi)</title>
+    <title>昨天下雪了 - HSK1 Lesson 12</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Custom animations */
-        @keyframes dash {
-            to {
-                stroke-dashoffset: -20;
-            }
+        .perspective-1000 { perspective: 1000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
-        .animate-dash {
-            animation: dash 1s linear infinite;
-        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- Icons (SVG Components) ---
-        // 内置图标以确保无需外部依赖即可运行
-        const BookOpen = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        // --- ICONS (Converted from lucide-react for standalone HTML support) ---
+        const IconBase = ({ size = 24, className = "", children }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
         );
-        const CheckCircle = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        );
-        const XCircle = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-        );
-        const RefreshCw = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        );
-        const Layout = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-        );
-        const MousePointer2 = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m12 6.5 7.6 12.3c.7 1.1-.3 2.5-1.6 2.2l-6-1.5-6 1.5c-1.3.3-2.3-1.1-1.6-2.2z"/></svg>
-        );
-        const GitMerge = ({ size = 24, className = "" }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
-        );
+        const Volume2 = (p) => <IconBase {...p}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></IconBase>;
+        const ChevronLeft = (p) => <IconBase {...p}><path d="m15 18-6-6 6-6"/></IconBase>;
+        const ChevronRight = (p) => <IconBase {...p}><path d="m9 18 6-6-6-6"/></IconBase>;
+        const CheckCircle2 = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></IconBase>;
+        const XCircle = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></IconBase>;
+        const RotateCcw = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconBase>;
+        const BookOpen = (p) => <IconBase {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
+        const MessageCircle = (p) => <IconBase {...p}><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></IconBase>;
+        const FileText = (p) => <IconBase {...p}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></IconBase>;
+        const Award = (p) => <IconBase {...p}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></IconBase>;
+        const Edit3 = (p) => <IconBase {...p}><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></IconBase>;
+        const Check = (p) => <IconBase {...p}><path d="M20 6 9 17l-5-5"/></IconBase>;
+        const Activity = (p) => <IconBase {...p}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></IconBase>;
 
-        // --- 数据与常量 (Data & Constants) ---
-
-        const GRAMMAR_TERMS = {
-            subject: { cn: "主语", uz: "Ega", color: "#3B82F6" }, // Blue
-            predicate: { cn: "谓语(动词)", uz: "Kesim (Fe'l)", color: "#EF4444" }, // Red
-            object: { cn: "宾语", uz: "To'ldiruvchi", color: "#10B981" }, // Green
-            particle: { cn: "助词(得)", uz: "Yordamchi (de)", color: "#94A3B8" }, // Gray - Structural particle
-            adverb: { cn: "副词(很/也)", uz: "Ravish", color: "#6366f1" }, // Indigo - Adverbs like hěn, yě
-            adjective: { cn: "形容词(补语)", uz: "Sifat (Holat)", color: "#F59E0B" }, // Yellow/Orange - Complement of degree
-            negative: { cn: "否定词(不)", uz: "Inkor (bu)", color: "#DC2626" }, // Dark Red
-            comparison: { cn: "介词(比)", uz: "Solishtirish (bi)", color: "#8B5CF6" } // Purple
-        };
-
-        const LESSONS = [
-            {
-                id: 1,
-                title: { cn: "肯定形式 (Tasdiq shakli)", uz: "\"得\" yordamchisi bilan tasdiq gaplar" },
-                description: { cn: "描述动作进行的程度或状态。", uz: "Harakatning bajarilish darajasini yoki holatini ifodalash." },
-                structures: [
-                    "Ega + Fe'l + 得 + (Ravish) + Sifat",
-                    "Ega + Fe'l + To'ld + Fe'l + 得 + (Ravish) + Sifat"
-                ],
-                examples: [
-                {
-                    structureType: "结构 1: Ega + Fe'l + 得 + Sifat",
-                    chars: ["他", "跑", "得", "快"],
-                    pinyin: ["Tā", "pǎo", "de", "kuài"],
-                    uzbek: ["U tez yuguradi"],
-                    roles: ["subject", "predicate", "particle", "adjective"]
-                },
-                {
-                    structureType: "结构 1: Ega + Fe'l + 得 + Sifat",
-                    chars: ["妹妹", "起", "得", "早"],
-                    pinyin: ["Mèimei", "qǐ", "de", "zǎo"],
-                    uzbek: ["Singlim erta turadi"],
-                    roles: ["subject", "predicate", "particle", "adjective"]
-                },
-                {
-                    structureType: "结构 1 (Ravish bilan): ... 得 + Ravish + Sifat",
-                    chars: ["我", "睡", "得", "也", "早"],
-                    pinyin: ["Wǒ", "shuì", "de", "yě", "zǎo"],
-                    uzbek: ["Men ham erta uxlayman"],
-                    roles: ["subject", "predicate", "particle", "adverb", "adjective"]
-                },
-                {
-                    structureType: "结构 2: Ega + Fe'l + To'ld + Fe'l + 得 + Sifat",
-                    chars: ["他", "学", "汉语", "学", "得", "好"],
-                    pinyin: ["Tā", "xué", "Hànyǔ", "xué", "de", "hǎo"],
-                    uzbek: ["U xitoy tilini yaxshi o'rganadi"],
-                    roles: ["subject", "predicate", "object", "predicate", "particle", "adjective"]
-                },
-                {
-                    structureType: "结构 2 (Ravish bilan): ... 得 + Ravish + Sifat",
-                    chars: ["我", "写", "汉字", "写", "得", "很", "好"],
-                    pinyin: ["Wǒ", "xiě", "Hànzì", "xiě", "de", "hěn", "hǎo"],
-                    uzbek: ["Men xitoy iyerogliflarini juda yaxshi yozaman"],
-                    roles: ["subject", "predicate", "object", "predicate", "particle", "adverb", "adjective"]
-                }
-                ]
-            },
-            {
-                id: 2,
-                title: { cn: "否定形式 (Inkor shakli)", uz: "\"得\" yordamchisi bilan inkor gaplar" },
-                description: { cn: "在形容词前加“不”表示否定。", uz: "Sifat oldiga \"bù\" qo'shib inkor yasaladi." },
-                structures: [
-                    "Ega + Fe'l + 得 + 不 + Sifat",
-                    "Ega + Fe'l + To'ld + Fe'l + 得 + 不 + Sifat"
-                ],
-                examples: [
-                {
-                    structureType: "结构 1: Ega + Fe'l + 得 + 不 + Sifat",
-                    chars: ["他", "跑", "得", "不", "快"],
-                    pinyin: ["Tā", "pǎo", "de", "bú", "kuài"],
-                    uzbek: ["U tez yugurmaydi"],
-                    roles: ["subject", "predicate", "particle", "negative", "adjective"]
-                },
-                {
-                    structureType: "结构 1: Ega + Fe'l + 得 + 不 + Sifat",
-                    chars: ["我", "住", "得", "不", "远"],
-                    pinyin: ["Wǒ", "zhù", "de", "bù", "yuǎn"],
-                    uzbek: ["Men uzoqda yashamayman"],
-                    roles: ["subject", "predicate", "particle", "negative", "adjective"]
-                },
-                {
-                    structureType: "结构 2: Ega + Fe'l + To'ld + Fe'l + 得 + 不 + Sifat",
-                    chars: ["她", "做", "饭", "做", "得", "不", "好"],
-                    pinyin: ["Tā", "zuò", "fàn", "zuò", "de", "bù", "hǎo"],
-                    uzbek: ["U ovqatni yaxshi pishirolmaydi"],
-                    roles: ["subject", "predicate", "object", "predicate", "particle", "negative", "adjective"]
-                },
-                {
-                    structureType: "结构 2: Ega + Fe'l + To'ld + ... + 得 + 不 + Sifat",
-                    chars: ["姐姐", "唱", "歌", "唱", "得", "不", "错"],
-                    pinyin: ["Jiějie", "chàng", "gē", "chàng", "de", "bú", "cuò"],
-                    uzbek: ["Opam qo'shiqni yomon aytmaydi (yaxshi aytadi)"],
-                    roles: ["subject", "predicate", "object", "predicate", "particle", "negative", "adjective"]
-                }
-                ]
-            },
-            {
-                id: 3,
-                title: { cn: "比较结构 (Solishtirish)", uz: "\"比\" va \"得\" ishtirokida solishtirish" },
-                description: { cn: "结合“比”字句和“得”字句进行比较。", uz: "\"Bi\" (qaraganda) va \"De\" yordamchilarini birga ishlatish." },
-                structures: [
-                    "A 比 B + Fe'l + 得 + Sifat",
-                    "A + Fe'l + 得 + 比 B + Sifat"
-                ],
-                examples: [
-                {
-                    structureType: "结构 1: A 比 B + Fe'l + 得 + Sifat",
-                    chars: ["哥哥", "比", "弟弟", "跑", "得", "快"],
-                    pinyin: ["Gēge", "bǐ", "dìdi", "pǎo", "de", "kuài"],
-                    uzbek: ["Aka ukasidan tezroq yuguradi"],
-                    roles: ["subject", "comparison", "object", "predicate", "particle", "adjective"]
-                },
-                {
-                    structureType: "结构 1: A 比 B + Fe'l + 得 + Sifat",
-                    chars: ["我", "妻子", "比", "我", "做", "得", "好"],
-                    pinyin: ["Wǒ qīzi", "bǐ", "wǒ", "zuò", "de", "hǎo"],
-                    uzbek: ["Xotinim mendan yaxshiroq bajaradi"],
-                    roles: ["subject", "comparison", "object", "predicate", "particle", "adjective"]
-                },
-                {
-                    structureType: "结构 2: A + Fe'l + 得 + 比 B + Sifat",
-                    chars: ["他", "跑", "得", "比", "我", "快"],
-                    pinyin: ["Tā", "pǎo", "de", "bǐ", "wǒ", "kuài"],
-                    uzbek: ["U mendan tezroq yuguradi"],
-                    roles: ["subject", "predicate", "particle", "comparison", "object", "adjective"]
-                }
-                ]
-            }
+        // --- DATA ---
+        const vocabData = [
+          { zh: "天气", py: "tiānqì", uz: "ob-havo", ru: "погода", en: "weather" },
+          { zh: "这里", py: "zhèlǐ", uz: "bu yerda / shu yerda", ru: "здесь", en: "here" },
+          { zh: "天", py: "tiān", uz: "osmon, kun, havo", ru: "небо, день, погода", en: "sky, day, weather" },
+          { zh: "下雨", py: "xià yǔ", uz: "yomg'ir yog'moq", ru: "идет дождь", en: "to rain" },
+          { zh: "了", py: "le", uz: "o'tgan zamon/holat o'zgarishi qo'shimchasi", ru: "частица изменения состояния", en: "modal particle" },
+          { zh: "雨", py: "yǔ", uz: "yomg'ir", ru: "дождь", en: "rain" },
+          { zh: "有点儿", py: "yǒudiǎnr", uz: "bir oz", ru: "немного", en: "a bit" },
+          { zh: "觉得", py: "juéde", uz: "his qilmoq / o'ylamoq", ru: "чувствовать, думать", en: "to feel, to think" },
+          { zh: "冷", py: "lěng", uz: "sovuq", ru: "холодный", en: "cold" },
+          { zh: "下", py: "xià", uz: "yog'moq (qor/yomg'ir)", ru: "падать (осадкам)", en: "to fall (rain/snow)" },
+          { zh: "雪", py: "xuě", uz: "qor", ru: "снег", en: "snow" },
+          { zh: "来", py: "lái", uz: "kelmoq", ru: "приходить", en: "to come" },
+          { zh: "公司", py: "gōngsī", uz: "kompaniya", ru: "компания", en: "company" },
+          { zh: "生病", py: "shēngbìng", uz: "kasal bo'lmoq", ru: "заболеть", en: "to fall ill" },
+          { zh: "看病", py: "kànbìng", uz: "shifokorga ko'rinmoq", ru: "обратиться к врачу", en: "to see a doctor" },
+          { zh: "病", py: "bìng", uz: "kasallik", ru: "болезнь", en: "illness" },
+          { zh: "一点儿", py: "yìdiǎnr", uz: "bir oz (miqdor)", ru: "немного", en: "a little" },
+          { zh: "药", py: "yào", uz: "dori", ru: "лекарство", en: "medicine" },
+          { zh: "回", py: "huí", uz: "qaytmoq", ru: "возвращаться", en: "to return" },
+          { zh: "再", py: "zài", uz: "yana / keyin", ru: "затем, снова", en: "then, again" },
+          { zh: "喝", py: "hē", uz: "ichmoq", ru: "пить", en: "to drink" },
+          { zh: "热", py: "rè", uz: "issiq", ru: "горячий", en: "hot" },
+          { zh: "水", py: "shuǐ", uz: "suv", ru: "вода", en: "water" }
         ];
 
-        // --- SVG Component ---
+        const dialogueData = [
+          {
+            title: "Muloqot 1 / Text 1",
+            lines: [
+              { speaker: "王一雪", zh: "今天天气怎么样？", py: "Jīntiān tiānqì zěnmeyàng?", uz: "Bugun ob-havo qanday?", ru: "Как сегодня погода?", en: "How's the weather today?" },
+              { speaker: "王一飞", zh: "这里的天不太好，下雨了。", py: "Zhèlǐ de tiān bú tài hǎo, xià yǔ le.", uz: "Bu yerdagi havo unchalik yaxshi emas, yomg'ir yog'yapti.", ru: "Погода здесь не очень, идет дождь.", en: "The weather here is not great. It's raining." },
+              { speaker: "王一雪", zh: "雨大吗？", py: "Yǔ dà ma?", uz: "Yomg'ir kuchlimi?", ru: "Дождь сильный?", en: "Is it raining heavily?" },
+              { speaker: "王一飞", zh: "有点儿大，我觉得很冷。", py: "Yǒudiǎnr dà, wǒ juéde hěn lěng.", uz: "Bir oz kuchli, men juda sovuq qotyapman.", ru: "Немного, мне очень холодно.", en: "A bit, and I feel really cold." }
+            ]
+          },
+          {
+            title: "Muloqot 2 / Text 2",
+            lines: [
+              { speaker: "王一雪", zh: "昨天下雪了。", py: "Zuótiān xià xuě le.", uz: "Kecha qor yog'di.", ru: "Вчера шел снег.", en: "It snowed yesterday." },
+              { speaker: "杨同乐", zh: "是的，太冷了。", py: "Shì de, tài lěng le.", uz: "Ha, juda sovuq edi.", ru: "Да, было очень холодно.", en: "Yes, it was so cold." },
+              { speaker: "王一雪", zh: "你昨天没来公司，生病了？", py: "Nǐ zuótiān méi lái gōngsī, shēngbìng le?", uz: "Siz kecha kompaniyaga kelmadingiz, kasal bo'lib qoldingizmi?", ru: "Ты вчера не пришел в компанию, заболел?", en: "You didn't come to the company yesterday. Were you feeling unwell?" },
+              { speaker: "杨同乐", zh: "对，我昨天去医院看病了。", py: "Duì, wǒ zuótiān qù yīyuàn kànbìng le.", uz: "Ha, kecha shifokorga ko'rinish uchun kasalxonaga bordim.", ru: "Да, я вчера ходил в больницу к врачу.", en: "Yes, I went to the hospital to see a doctor yesterday." }
+            ]
+          },
+          {
+            title: "Muloqot 3 / Text 3",
+            lines: [
+              { speaker: "杨同乐", zh: "医生，我病了。", py: "Yīshēng, wǒ bìng le.", uz: "Shifokor, men kasalman.", ru: "Доктор, я заболел.", en: "Doctor, I'm not feeling well." },
+              { speaker: "胡医生", zh: "我看看。你觉得怎么样？", py: "Wǒ kànkan. Nǐ juéde zěnmeyàng?", uz: "Qani ko'raychi. O'zingizni qanday his qilyapsiz?", ru: "Дайте посмотреть. Как вы себя чувствуете?", en: "Let me take a look. How are you feeling?" },
+              { speaker: "杨同乐", zh: "我很冷。", py: "Wǒ hěn lěng.", uz: "Men juda sovuq qotyapman.", ru: "Мне очень холодно.", en: "I feel very cold." },
+              { speaker: "胡医生", zh: "好的，吃一点儿药，今天休息半天吧。", py: "Hǎo de, chī yìdiǎnr yào, jīntiān xiūxi bàn tiān ba.", uz: "Yaxshi. Bir oz dori iching va bugun yarim kun dam oling.", ru: "Хорошо. Прими немного лекарства и отдохни полдня сегодня.", en: "Alright. Take some medicine and rest for half a day today." },
+              { speaker: "杨同乐", zh: "好的。", py: "Hǎo de.", uz: "Yaxshi.", ru: "Хорошо.", en: "OK." },
+              { speaker: "胡医生", zh: "回家后再喝些热水。", py: "Huí jiā hòu zài hē xiē rè shuǐ.", uz: "Uyga qaytgach, bir oz issiq suv iching.", ru: "По возвращении домой выпей горячей воды.", en: "Make sure to drink some warm water after you get home." }
+            ]
+          }
+        ];
 
-        const GrammarTree = ({ example, animate }) => {
-            const width = 850;
-            const height = 350;
-            const startY = 50; 
-            const endY = 220; 
-            
-            const count = example.roles.length;
-            const spacing = width / (count + 1);
-            
-            const nodes = example.roles.map((role, index) => {
-                const x = spacing * (index + 1);
-                const term = GRAMMAR_TERMS[role] || { cn: "未知", uz: "Noma'lum", color: "#ccc" };
-                return {
-                    x,
-                    y: endY,
-                    role: role,
-                    char: example.chars[index],
-                    pinyin: example.pinyin[index],
-                    color: term.color,
-                    cnTerm: term.cn,
-                    uzTerm: term.uz
-                };
-            });
+        const grammarData = [
+          {
+            title: "1. 非主谓句 (Egasiz-kesimsiz gaplar / Non-Subject-Predicate Sentences)",
+            explanation: {
+              uz: "Egasiz-kesimsiz gaplar so'z yoki iboralardan iborat bo'lib, aniq ega va kesimi bo'lmaydi. Ular so'zlashuv tilida ko'p ishlatiladi.",
+              ru: "Предложения без подлежащего и сказуемого состоят из слов или фраз без четкого подлежащего или сказуемого и часто используются в разговорной речи.",
+              en: "Non-subject-predicate sentences are composed of words or phrases without distinct subjects or predicates, and are commonly used in colloquial speech."
+            },
+            examples: [
+              { zh: "下雨了。", py: "Xià yǔ le.", uz: "Yomg'ir yog'yapti." },
+              { zh: "下雪了。", py: "Xià xuě le.", uz: "Qor yog'di." },
+              { zh: "对不起！", py: "Duìbuqǐ!", uz: "Kechirasiz!" }
+            ]
+          },
+          {
+            title: "2. 语气助词“了(1)” (Modal yuklama “了(1)” / Modal Particle “了(1)”)",
+            explanation: {
+              uz: "“了(1)” gap oxirida yoki gap ichidagi to'xtalishda kelib, holat o'zgarishini yoki yangi holat yuzaga kelganini bildiradi. Inkor javobda '没' ishlatiladi va '了' tushirib qoldiriladi.",
+              ru: "Модальная частица «了(1)» ставится в конце предложения или на паузе внутри предложения, чтобы указать на изменение или новую ситуацию. В отрицательных ответах используется наречие «没», а «了» опускается.",
+              en: "The modal particle '了(1)' is placed at the end of a sentence or at a pause within a sentence to indicate a change or a new situation. For negative responses, '没' is used, and '了' is omitted."
+            },
+            examples: [
+              { zh: "下雨了。", py: "Xià yǔ le.", uz: "Yomg'ir yog'yapti (boshlandi)." },
+              { zh: "十二点了，吃午饭吧。", py: "Shí'èr diǎn le, chī wǔfàn ba.", uz: "Soat o'n ikki bo'ldi, tushlik qilaylik." }
+            ]
+          },
+          {
+            title: "3. “太……了” 格式 (“太……了” Qurilmasi / “太……了” Pattern)",
+            explanation: {
+              uz: "“太……了” qoliplari biror narsaning darajasi juda yuqori yoki kuchli ekanligini ifodalash uchun ishlatiladi.",
+              ru: "Конструкция «太……了» выражает очень высокую или интенсивную степень восклицания.",
+              en: "The '太……了' pattern expresses a very high or intense degree of exclamation."
+            },
+            examples: [
+              { zh: "太冷了！", py: "Tài lěng le!", uz: "Juda sovuq!" },
+              { zh: "这个杯子太小了。", py: "Zhège bēizi tài xiǎo le.", uz: "Bu stakan juda kichkina." },
+              { zh: "我们今天太高兴了！", py: "Wǒmen jīntiān tài gāoxìng le!", uz: "Biz bugun juda xursandmiz!" }
+            ]
+          }
+        ];
 
-            return (
-                <div className="min-w-[600px] h-full">
-                    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full bg-slate-50 rounded-xl border border-slate-200 shadow-inner">
-                        <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
-                        </marker>
-                        </defs>
-                        <g transform={`translate(${width / 2}, ${startY})`}>
-                        <circle r="30" fill="#475569" className={animate ? "animate-pulse" : ""} />
-                        <text y="5" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">Gap</text>
-                        <text y="-40" textAnchor="middle" fill="#64748b" fontSize="14">句子</text>
-                        </g>
-                        {nodes.map((node, i) => (
-                        <g key={i} className="transition-all duration-500 ease-in-out">
-                            <path
-                            d={`M${width / 2} ${startY + 30} C ${width / 2} ${startY + 100}, ${node.x} ${node.y - 100}, ${node.x} ${node.y - 50}`}
-                            fill="none"
-                            stroke={node.color}
-                            strokeWidth="2"
-                            strokeDasharray={animate ? "5,5" : "0"}
-                            opacity="0.6"
-                            className={animate ? "animate-dash" : ""}
-                            />
-                            {/* Increased bubble width to 100 for Uzbek text */}
-                            <g transform={`translate(${node.x}, ${node.y - 70})`}>
-                            <rect x="-50" y="-18" width="100" height="36" rx="18" fill={node.color} className="shadow-sm" />
-                            <text y="4" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{node.uzTerm}</text>
-                            <text y="-24" textAnchor="middle" fill={node.color} fontSize="11" fontWeight="bold">{node.cnTerm}</text>
-                            </g>
-                            <g transform={`translate(${node.x}, ${node.y})`}>
-                            <rect x="-40" y="-25" width="80" height="65" rx="8" fill="white" stroke={node.color} strokeWidth="2" className="shadow-sm" />
-                            <text y="5" textAnchor="middle" fontSize="22" fontWeight="bold" fill="#1e293b">{node.char}</text>
-                            <text y="30" textAnchor="middle" fontSize="12" fill="#64748b">{node.pinyin}</text>
-                            </g>
-                        </g>
-                        ))}
-                    </svg>
-                </div>
-            );
+        const vocabQuizQuestions = [
+          { q: "天气", options: ["suv", "qor", "ob-havo", "kompaniya"], ans: 2 },
+          { q: "这里", options: ["bu yerda", "kasallik", "dori", "issiq"], ans: 0 },
+          { q: "天", options: ["kun/osmon", "yomg'ir", "sovuq", "ichmoq"], ans: 0 },
+          { q: "下雨", options: ["qor yog'moq", "yomg'ir yog'moq", "kelmoq", "qaytmoq"], ans: 1 },
+          { q: "雨", options: ["suv", "yomg'ir", "qor", "kasallik"], ans: 1 },
+          { q: "有点儿", options: ["bir oz", "juda", "issiq", "sovuq"], ans: 0 },
+          { q: "觉得", options: ["ichmoq", "qaytmoq", "his qilmoq", "kelmoq"], ans: 2 },
+          { q: "冷", options: ["issiq", "sovuq", "kasal", "suv"], ans: 1 },
+          { q: "下雪", options: ["yomg'ir yog'moq", "kasal bo'lmoq", "dori ichmoq", "qor yog'moq"], ans: 3 },
+          { q: "来", options: ["kelmoq", "qaytmoq", "ichmoq", "his qilmoq"], ans: 0 },
+          { q: "公司", options: ["shifoxona", "kompaniya", "ob-havo", "dori"], ans: 1 },
+          { q: "生病", options: ["kasal bo'lmoq", "shifokorga ko'rinmoq", "suv ichmoq", "yomg'ir yog'moq"], ans: 0 },
+          { q: "看病", options: ["kasal bo'lmoq", "shifokorga ko'rinmoq", "qaytmoq", "qor yog'moq"], ans: 1 },
+          { q: "病", options: ["kasallik", "dori", "kompaniya", "suv"], ans: 0 },
+          { q: "一点儿", options: ["juda", "bir oz", "issiq", "sovuq"], ans: 1 },
+          { q: "药", options: ["suv", "qor", "yomg'ir", "dori"], ans: 3 },
+          { q: "回", options: ["kelmoq", "qaytmoq", "ichmoq", "his qilmoq"], ans: 1 },
+          { q: "再", options: ["yana/keyin", "bu yerda", "bir oz", "juda"], ans: 0 },
+          { q: "喝", options: ["yemoq", "ichmoq", "kelmoq", "qaytmoq"], ans: 1 },
+          { q: "热", options: ["sovuq", "issiq", "kasal", "yaxshi"], ans: 1 },
+          { q: "水", options: ["dori", "qor", "yomg'ir", "suv"], ans: 3 }
+        ];
+
+        const grammarQuizQuestions = [
+          { q: "昨天不下雨，今天下雨( )。", q_py: "Zuótiān bú xià yǔ, jīntiān xià yǔ ( ).", options: ["的", "了", "吗", "呢"], ans: 1 },
+          { q: "这里的天气( )冷了。", q_py: "Zhèlǐ de tiānqì ( ) lěng le.", options: ["太", "大", "多", "少"], ans: 0 },
+          { q: "我觉得( )点儿冷。", q_py: "Wǒ juéde ( ) diǎnr lěng.", options: ["有", "看", "去", "吃"], ans: 0 },
+          { q: "医生给我看( )了。", q_py: "Yīshēng gěi wǒ kàn ( ) le.", options: ["水", "雪", "病", "天"], ans: 2 },
+          { q: "你( )天没来公司。", q_py: "Nǐ ( ) tiān méi lái gōngsī.", options: ["明", "昨", "今", "后"], ans: 1 },
+          { q: "他去医院看( )。", q_py: "Tā qù yīyuàn kàn ( ).", options: ["病", "狗", "天", "水"], ans: 0 },
+          { q: "这件衣服( )贵了！", q_py: "Zhè jiàn yīfu ( ) guì le!", options: ["大", "太", "小", "不"], ans: 1 },
+          { q: "下( )了，天气很冷。", q_py: "Xià ( ) le, tiānqì hěn lěng.", options: ["冰", "风", "雪", "云"], ans: 2 },
+          { q: "生病了，多( )点儿热水。", q_py: "Shēngbìng le, duō ( ) diǎnr rè shuǐ.", options: ["吃", "喝", "看", "写"], ans: 1 },
+          { q: "今天( )气怎么样？", q_py: "Jīntiān ( ) qì zěnmeyàng?", options: ["天", "水", "火", "冷"], ans: 0 },
+          { q: "我不舒服，我生( )了。", q_py: "Wǒ bù shūfu, wǒ shēng ( ) le.", options: ["气", "病", "火", "事"], ans: 1 },
+          { q: "吃一( )儿药吧。", q_py: "Chī yì ( ) r yào ba.", options: ["口", "块", "点", "杯"], ans: 2 },
+          { q: "今天休息半( )吧。", q_py: "Jīntiān xiūxi bàn ( ) ba.", options: ["天", "年", "月", "日"], ans: 0 },
+          { q: "( )家后再喝水。", q_py: "( ) jiā hòu zài hē shuǐ.", options: ["回", "去", "来", "出"], ans: 0 },
+          { q: "我觉得有( )儿不舒服。", q_py: "Wǒ juéde yǒu ( ) diǎnr bù shūfu.", options: ["点", "多", "少", "大"], ans: 0 }
+        ];
+
+        const fillBlanksQuestions = [
+          {
+            sentence: ["今天", "怎么样？"],
+            sentence_py: ["Jīntiān", "zěnmeyàng?"],
+            answer: "天气",
+            options: ["天气", "公司", "水", "药"]
+          },
+          {
+            sentence: ["", "的天不太好。"],
+            sentence_py: ["", "de tiān bú tài hǎo."],
+            answer: "这里",
+            options: ["那里", "这里", "明天", "觉得"]
+          },
+          {
+            sentence: ["外边", "了。"],
+            sentence_py: ["Wàibian", "le."],
+            answer: "下雨",
+            options: ["生病", "喝", "下雨", "看病"]
+          },
+          {
+            sentence: ["我", "很冷。"],
+            sentence_py: ["Wǒ", "hěn lěng."],
+            answer: "觉得",
+            options: ["喝", "觉得", "下雪", "回"]
+          },
+          {
+            sentence: ["昨天", "了，太冷了！"],
+            sentence_py: ["Zuótiān", "le, tài lěng le!"],
+            answer: "下雪",
+            options: ["来", "看病", "下雪", "热"]
+          },
+          {
+            sentence: ["你昨天没", "公司。"],
+            sentence_py: ["Nǐ zuótiān méi", "gōngsī."],
+            answer: "来",
+            options: ["回", "来", "喝", "下"]
+          },
+          {
+            sentence: ["我", "了，去医院了。"],
+            sentence_py: ["Wǒ", "le, qù yīyuàn le."],
+            answer: "生病",
+            options: ["生病", "觉得", "冷", "热"]
+          },
+          {
+            sentence: ["医生让我吃一点儿", "。"],
+            sentence_py: ["Yīshēng ràng wǒ chī yìdiǎnr", "."],
+            answer: "药",
+            options: ["水", "药", "雪", "雨"]
+          },
+          {
+            sentence: ["回家后", "喝些水。"],
+            sentence_py: ["Huí jiā hòu", "hē xiē shuǐ."],
+            answer: "再",
+            options: ["再", "回", "去", "有"]
+          },
+          {
+            sentence: ["喝些", "水。"],
+            sentence_py: ["Hē xiē", "shuǐ."],
+            answer: "热",
+            options: ["冷", "热", "大", "小"]
+          }
+        ];
+
+        // --- HELPER COMPONENTS ---
+
+        const playAudio = (text) => {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'zh-CN';
+            window.speechSynthesis.speak(msg);
+          }
         };
 
-        // --- Main App Component ---
+        const TabButton = ({ active, onClick, icon: Icon, label }) => (
+          <button
+            onClick={onClick}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-xl transition-all duration-300 font-medium whitespace-nowrap
+              ${active 
+                ? 'bg-white/20 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] border border-white/30' 
+                : 'text-white/60 hover:text-white hover:bg-white/10'}`}
+          >
+            <Icon size={18} />
+            <span>{label}</span>
+          </button>
+        );
 
-        function ChineseGrammarApp() {
-            const [activeTab, setActiveTab] = useState('learn');
-            const [currentLessonId, setCurrentLessonId] = useState(1);
-            const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
-            const [animateDiagram, setAnimateDiagram] = useState(false);
+        // --- MAIN COMPONENTS FOR TABS ---
 
-            // For Practice Mode
-            const [practiceSentence, setPracticeSentence] = useState([]);
-            const [feedback, setFeedback] = useState(null); 
-            
-            const currentLesson = LESSONS.find(l => l.id === currentLessonId);
-            const currentExample = currentLesson.examples[currentExampleIndex];
+        const Flashcards = () => {
+          const [index, setIndex] = useState(0);
+          const [isFlipped, setIsFlipped] = useState(false);
 
-            useEffect(() => {
-                setAnimateDiagram(true);
-                const timer = setTimeout(() => setAnimateDiagram(false), 1000);
-                return () => clearTimeout(timer);
-            }, [currentExample, currentLessonId]);
+          const nextCard = () => {
+            setIsFlipped(false);
+            setTimeout(() => setIndex((prev) => (prev + 1) % vocabData.length), 150);
+          };
+          const prevCard = () => {
+            setIsFlipped(false);
+            setTimeout(() => setIndex((prev) => (prev - 1 + vocabData.length) % vocabData.length), 150);
+          };
 
-            const practiceWords = [
-                { id: 1, char: "他", pinyin: "Tā", role: "subject", color: GRAMMAR_TERMS.subject.color },
-                { id: 2, char: "跑", pinyin: "pǎo", role: "predicate", color: GRAMMAR_TERMS.predicate.color },
-                { id: 3, char: "得", pinyin: "de", role: "particle", color: GRAMMAR_TERMS.particle.color },
-                { id: 4, char: "快", pinyin: "kuài", role: "adjective", color: GRAMMAR_TERMS.adjective.color },
-                { id: 5, char: "不", pinyin: "bù", role: "negative", color: GRAMMAR_TERMS.negative.color },
-                { id: 6, char: "比", pinyin: "bǐ", role: "comparison", color: GRAMMAR_TERMS.comparison.color },
-                { id: 7, char: "我", pinyin: "wǒ", role: "object", color: GRAMMAR_TERMS.object.color }, 
-                { id: 8, char: "很", pinyin: "hěn", role: "adverb", color: GRAMMAR_TERMS.adverb.color },
-                { id: 9, char: "说", pinyin: "shuō", role: "predicate", color: GRAMMAR_TERMS.predicate.color },
-                { id: 10, char: "做", pinyin: "zuò", role: "predicate", color: GRAMMAR_TERMS.predicate.color },
-                { id: 11, char: "学", pinyin: "xué", role: "predicate", color: GRAMMAR_TERMS.predicate.color },
-                { id: 12, char: "好", pinyin: "hǎo", role: "adjective", color: GRAMMAR_TERMS.adjective.color },
-                { id: 13, char: "慢", pinyin: "màn", role: "adjective", color: GRAMMAR_TERMS.adjective.color },
-                { id: 14, char: "早", pinyin: "zǎo", role: "adjective", color: GRAMMAR_TERMS.adjective.color },
-            ];
+          const card = vocabData[index];
 
-            const addToPractice = (word) => {
-                const newWord = { ...word, uniqueId: Date.now() + Math.random() }; 
-                setPracticeSentence([...practiceSentence, newWord]);
-                setFeedback(null);
-            };
+          return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+              <div className="text-white/80 mb-6 font-medium tracking-wider">{index + 1} / {vocabData.length}</div>
+              
+              <div 
+                className="relative w-full max-w-md h-80 perspective-1000 cursor-pointer group"
+                onClick={() => setIsFlipped(!isFlipped)}
+              >
+                <div className={`w-full h-full transition-transform duration-700 preserve-3d relative ${isFlipped ? 'rotate-y-180' : ''}`}>
+                  
+                  {/* Front */}
+                  <div className="absolute w-full h-full backface-hidden bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl">
+                     <button 
+                        onClick={(e) => { e.stopPropagation(); playAudio(card.zh); }}
+                        className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white"
+                      >
+                        <Volume2 size={24} />
+                      </button>
+                      <h2 className="text-8xl font-bold text-white mb-4 drop-shadow-lg">{card.zh}</h2>
+                  </div>
 
-            const removeFromPractice = (uniqueId) => {
-                setPracticeSentence(practiceSentence.filter(w => w.uniqueId !== uniqueId));
-                setFeedback(null);
-            };
+                  {/* Back */}
+                  <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-indigo-500/80 to-purple-600/80 backdrop-blur-xl border border-white/30 rounded-3xl p-8 flex flex-col items-center justify-center shadow-2xl text-center">
+                     <button 
+                        onClick={(e) => { e.stopPropagation(); playAudio(card.zh); }}
+                        className="absolute top-6 right-6 p-3 bg-white/20 hover:bg-white/30 rounded-full transition-colors text-white"
+                      >
+                        <Volume2 size={24} />
+                      </button>
+                     <h3 className="text-4xl font-bold text-white mb-6 tracking-wide">{card.py}</h3>
+                     <div className="w-16 h-1 bg-white/40 rounded-full mb-6"></div>
+                     <p className="text-xl text-white/90 mb-2"><span className="font-semibold text-indigo-100 mr-2">UZ:</span> {card.uz}</p>
+                     <p className="text-xl text-white/90 mb-2"><span className="font-semibold text-indigo-100 mr-2">RU:</span> {card.ru}</p>
+                     <p className="text-xl text-white/90"><span className="font-semibold text-indigo-100 mr-2">EN:</span> {card.en}</p>
+                  </div>
+                </div>
+              </div>
 
-            const clearPractice = () => {
-                setPracticeSentence([]);
-                setFeedback(null);
-            };
+              <div className="flex space-x-6 mt-10">
+                <button onClick={prevCard} className="px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors border border-white/10 flex items-center">
+                  <ChevronLeft size={20} className="mr-2" /> Oldingi
+                </button>
+                <button onClick={nextCard} className="px-6 py-3 rounded-full bg-white/20 hover:bg-white/30 text-white font-medium transition-colors border border-white/20 flex items-center shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                  Keyingi <ChevronRight size={20} className="ml-2" />
+                </button>
+              </div>
+            </div>
+          );
+        };
 
-            const checkSentence = () => {
-                if (practiceSentence.length === 0) {
-                setFeedback({ type: 'error', msgCn: '请先选择词语', msgUz: "Iltimos so'zlarni tanlang" });
-                return;
-                }
+        const Quiz = ({ questions, title }) => {
+          const [currentQ, setCurrentQ] = useState(0);
+          const [score, setScore] = useState(0);
+          const [showResult, setShowResult] = useState(false);
+          const [selectedOpt, setSelectedOpt] = useState(null);
+          const [isAnswered, setIsAnswered] = useState(false);
 
-                const deIndex = practiceSentence.findIndex(w => w.char === '得');
+          const handleOptionClick = (idx) => {
+            if (isAnswered) return;
+            setSelectedOpt(idx);
+            setIsAnswered(true);
+            if (idx === questions[currentQ].ans) {
+              setScore(score + 1);
+            }
+          };
 
-                if (deIndex === -1) {
-                setFeedback({ type: 'error', msgCn: '句子必须包含“得”字', msgUz: "Gapda \"de\" qatnashishi shart" });
-                return;
-                }
+          const nextQ = () => {
+            if (currentQ < questions.length - 1) {
+              setCurrentQ(currentQ + 1);
+              setSelectedOpt(null);
+              setIsAnswered(false);
+            } else {
+              setShowResult(true);
+            }
+          };
 
-                if (deIndex === 0) {
-                setFeedback({ type: 'error', msgCn: '“得”字不能在开头', msgUz: "\"De\" gap boshida kelmaydi" });
-                return;
-                }
-                if (deIndex === practiceSentence.length - 1) {
-                setFeedback({ type: 'error', msgCn: '句子未完成', msgUz: "Gap tugallanmagan" });
-                return;
-                }
+          const reset = () => {
+            setCurrentQ(0);
+            setScore(0);
+            setShowResult(false);
+            setSelectedOpt(null);
+            setIsAnswered(false);
+          };
 
-                const beforeWord = practiceSentence[deIndex - 1];
-                if (beforeWord.role !== 'predicate') {
-                setFeedback({ 
-                    type: 'error', 
-                    msgCn: `“得”字前面应该是动词，而不是“${beforeWord.char}”`, 
-                    msgUz: `"De" dan oldin fe'l kelishi kerak ("${beforeWord.char}" emas)` 
-                });
-                return;
-                }
-
-                const afterWord = practiceSentence[deIndex + 1];
-                const validAfterRoles = ['adjective', 'adverb', 'negative', 'comparison'];
-                
-                if (!validAfterRoles.includes(afterWord.role)) {
-                setFeedback({ 
-                    type: 'error', 
-                    msgCn: `“得”字后面通常接形容词、否定词或比较词`, 
-                    msgUz: `"De" dan keyin sifat, inkor yoki solishtirish so'zi kelishi kerak` 
-                });
-                return;
-                }
-
-                setFeedback({ type: 'success', msgCn: '做得好！句子结构正确。', msgUz: "Barakalla! Gap tuzilishi to'g'ri." });
-            };
-
+          if (showResult) {
             return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-8">
-                {/* Mobile-optimized Header */}
-                <header className="bg-blue-600 text-white p-3 sm:p-4 shadow-lg sticky top-0 z-10">
-                    <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
-                    <div className="text-center sm:text-left w-full sm:w-auto">
-                        <h1 className="text-lg sm:text-2xl font-bold flex items-center justify-center sm:justify-start gap-2">
-                        <BookOpen size={20} className="sm:w-6 sm:h-6 flex-shrink-0" />
-                        <span className="truncate">Xitoy tili grammatikasi: "得" yordamchisi</span>
-                        </h1>
-                        <p className="text-blue-100 text-xs sm:text-sm truncate">Dilfuza Kāng lǎo shī bilan xitoy tilini o'rganmiz</p>
-                    </div>
-                    <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex flex-col items-center justify-center min-h-[50vh] bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 max-w-2xl mx-auto shadow-2xl">
+                <Award size={80} className="text-yellow-400 mb-6 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
+                <h2 className="text-4xl font-bold text-white mb-4">Natija</h2>
+                <p className="text-2xl text-white/80 mb-8">Siz {questions.length} ta savoldan <span className="text-3xl font-bold text-green-400 mx-2">{score}</span> tasiga to'g'ri javob berdingiz!</p>
+                <button onClick={reset} className="px-8 py-4 bg-indigo-500/80 hover:bg-indigo-500 text-white rounded-full font-bold text-lg transition-all shadow-[0_0_20px_rgba(99,102,241,0.4)] flex items-center">
+                  <RotateCcw size={22} className="mr-3" /> Qayta urinib ko'rish
+                </button>
+              </div>
+            );
+          }
+
+          const q = questions[currentQ];
+
+          return (
+            <div className="max-w-2xl mx-auto min-h-[50vh] flex flex-col justify-center">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-1 bg-white/20 w-full">
+                  <div className="h-full bg-indigo-400 transition-all duration-500" style={{ width: `${((currentQ) / questions.length) * 100}%` }}></div>
+                </div>
+                
+                <div className="flex justify-between items-center mb-8">
+                  <span className="text-indigo-200 font-medium text-lg px-4 py-1 bg-indigo-900/40 rounded-full border border-indigo-500/30">Savol {currentQ + 1} / {questions.length}</span>
+                  <span className="text-white/60">{title}</span>
+                </div>
+
+                {q.q_py && <h4 className="text-2xl md:text-3xl font-medium text-indigo-300 text-center mb-2 tracking-wide">{q.q_py}</h4>}
+                <h3 className="text-4xl md:text-6xl font-bold text-white text-center mb-12 drop-shadow-md">{q.q}</h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {q.options.map((opt, idx) => {
+                    let btnClass = "bg-white/5 border-white/10 hover:bg-white/15 text-white/90";
+                    let Icon = null;
+                    
+                    if (isAnswered) {
+                      if (idx === q.ans) {
+                        btnClass = "bg-green-500/20 border-green-500/50 text-green-100 shadow-[0_0_15px_rgba(34,197,94,0.2)]";
+                        Icon = CheckCircle2;
+                      } else if (idx === selectedOpt) {
+                        btnClass = "bg-red-500/20 border-red-500/50 text-red-100";
+                        Icon = XCircle;
+                      } else {
+                        btnClass = "bg-white/5 border-white/5 text-white/30 opacity-50";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleOptionClick(idx)}
+                        className={`relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300 text-lg font-medium ${btnClass}`}
+                      >
+                        <span>{opt}</span>
+                        {Icon && <Icon size={24} className={idx === q.ans ? "text-green-400" : "text-red-400"} />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {isAnswered && (
+                  <div className="mt-10 flex justify-end animate-fade-in">
+                    <button onClick={nextQ} className="px-8 py-3 bg-white text-indigo-900 rounded-full font-bold hover:bg-indigo-50 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center">
+                      Keyingi <ChevronRight size={20} className="ml-2" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        const Dialogues = () => {
+          return (
+            <div className="max-w-4xl mx-auto space-y-12 pb-10">
+              {dialogueData.map((dialogue, idx) => (
+                <div key={idx} className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <h2 className="text-3xl font-bold text-white border-b border-white/10 pb-4 mb-6">{dialogue.title}</h2>
+                  <div className="space-y-6">
+                    {dialogue.lines.map((line, lIdx) => (
+                      <div key={lIdx} className="group relative bg-white/5 hover:bg-white/10 transition-colors rounded-2xl p-6 border border-white/5">
                         <button 
-                        onClick={() => setActiveTab('learn')}
-                        className={`flex-1 sm:flex-none px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-sm sm:text-base transition text-center ${activeTab === 'learn' ? 'bg-white text-blue-600 shadow' : 'bg-blue-700 text-white hover:bg-blue-600'}`}
+                          onClick={() => playAudio(line.zh)}
+                          className="absolute right-6 top-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white opacity-0 group-hover:opacity-100"
                         >
-                        学习 (O'rganish)
+                          <Volume2 size={20} />
                         </button>
-                        <button 
-                        onClick={() => { setActiveTab('practice'); setFeedback(null); }}
-                        className={`flex-1 sm:flex-none px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-sm sm:text-base transition text-center ${activeTab === 'practice' ? 'bg-white text-blue-600 shadow' : 'bg-blue-700 text-white hover:bg-blue-600'}`}
-                        >
-                        练习 (Mashq)
+                        <div className="flex flex-col space-y-2 pr-12">
+                          <div className="text-sm font-bold text-indigo-300 uppercase tracking-wider">{line.speaker}</div>
+                          <div className="text-3xl font-bold text-white tracking-wide">{line.zh}</div>
+                          <div className="text-xl text-indigo-200 font-medium mb-2">{line.py}</div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-white/5 mt-2">
+                            <div className="text-white/80"><span className="text-xs text-white/40 block mb-1 uppercase font-bold">Uzbek</span> {line.uz}</div>
+                            <div className="text-white/80"><span className="text-xs text-white/40 block mb-1 uppercase font-bold">Russian</span> {line.ru}</div>
+                            <div className="text-white/80"><span className="text-xs text-white/40 block mb-1 uppercase font-bold">English</span> {line.en}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        };
+
+        const Grammar = () => {
+          return (
+            <div className="max-w-4xl mx-auto space-y-8 pb-10">
+              {grammarData.map((item, idx) => (
+                <div key={idx} className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 shadow-2xl">
+                  <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                    <BookOpen className="mr-3 text-indigo-300" /> {item.title}
+                  </h2>
+                  <div className="bg-black/20 rounded-2xl p-6 mb-6 border border-white/5">
+                    <p className="text-lg text-white/90 mb-3"><span className="font-bold text-indigo-300 mr-2">UZ:</span>{item.explanation.uz}</p>
+                    <p className="text-lg text-white/90 mb-3"><span className="font-bold text-indigo-300 mr-2">RU:</span>{item.explanation.ru}</p>
+                    <p className="text-lg text-white/90"><span className="font-bold text-indigo-300 mr-2">EN:</span>{item.explanation.en}</p>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white/80 mb-4 px-2">Examples:</h3>
+                  <div className="space-y-3">
+                    {item.examples.map((ex, eIdx) => (
+                      <div key={eIdx} className="bg-white/5 rounded-xl p-5 border border-white/10 flex items-center justify-between hover:bg-white/10 transition-colors group">
+                        <div>
+                          <div className="text-2xl font-bold text-white mb-1">{ex.zh}</div>
+                          <div className="text-lg text-indigo-200">{ex.py}</div>
+                          <div className="text-md text-white/70 mt-1">{ex.uz}</div>
+                        </div>
+                        <button onClick={() => playAudio(ex.zh)} className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white opacity-0 group-hover:opacity-100">
+                          <Volume2 size={20} />
                         </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        };
+
+        const FillInTheBlanks = () => {
+          const [answers, setAnswers] = useState(Array(fillBlanksQuestions.length).fill(""));
+          const [submitted, setSubmitted] = useState(false);
+
+          const handleSelect = (idx, value) => {
+            if (submitted) return;
+            const newAns = [...answers];
+            newAns[idx] = value;
+            setAnswers(newAns);
+          };
+
+          const calculateScore = () => {
+            let s = 0;
+            answers.forEach((ans, i) => {
+              if (ans === fillBlanksQuestions[i].answer) s++;
+            });
+            return s;
+          };
+
+          const reset = () => {
+            setAnswers(Array(fillBlanksQuestions.length).fill(""));
+            setSubmitted(false);
+          };
+
+          return (
+            <div className="max-w-3xl mx-auto min-h-[50vh] pb-10">
+              <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 sm:p-10 shadow-2xl">
+                <h2 className="text-3xl font-bold text-white mb-8 flex items-center border-b border-white/10 pb-4">
+                  <Edit3 className="mr-3 text-indigo-300" /> So'zlarni to'ldirish
+                </h2>
+                
+                <div className="space-y-6">
+                  {fillBlanksQuestions.map((q, idx) => {
+                    const isCorrect = answers[idx] === q.answer;
+                    return (
+                      <div key={idx} className={`p-6 rounded-2xl border transition-colors ${submitted ? (isCorrect ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30') : 'bg-white/5 border-white/10'}`}>
+                        <div className="flex items-end flex-wrap gap-x-3 gap-y-4 text-2xl font-bold text-white mb-2">
+                          <span className="mb-1 text-indigo-400">{idx + 1}.</span>
+                          
+                          {q.sentence[0] && (
+                            <div className="flex flex-col items-center">
+                              <span className="text-sm md:text-base font-normal text-indigo-300 h-6 leading-none tracking-wider">{q.sentence_py[0]}</span>
+                              <span>{q.sentence[0]}</span>
+                            </div>
+                          )}
+
+                          <div className="flex flex-col items-center relative">
+                            <span className="text-sm font-normal text-transparent h-6 leading-none">_</span>
+                            <select
+                              value={answers[idx]}
+                              onChange={(e) => handleSelect(idx, e.target.value)}
+                              disabled={submitted}
+                              className={`appearance-none bg-black/30 border-b-2 outline-none text-center px-4 py-2 min-w-[120px] cursor-pointer transition-colors
+                                ${submitted ? (isCorrect ? 'border-green-400 text-green-300' : 'border-red-400 text-red-300') : 'border-indigo-400 focus:border-indigo-300 text-indigo-200'}`}
+                            >
+                              <option value="" disabled>___</option>
+                              {q.options.map((opt, oIdx) => (
+                                <option key={oIdx} value={opt} className="bg-slate-800 text-white">{opt}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {q.sentence[1] && (
+                            <div className="flex flex-col items-center">
+                              <span className="text-sm md:text-base font-normal text-indigo-300 h-6 leading-none tracking-wider">{q.sentence_py[1]}</span>
+                              <span>{q.sentence[1]}</span>
+                            </div>
+                          )}
+                          
+                          {submitted && (
+                            <span className="ml-auto mb-1">
+                              {isCorrect ? <CheckCircle2 className="text-green-400" size={28} /> : <XCircle className="text-red-400" size={28} />}
+                            </span>
+                          )}
+                        </div>
+                        {submitted && !isCorrect && (
+                           <div className="mt-3 text-red-200 text-sm font-medium">To'g'ri javob: <span className="font-bold text-green-300 text-lg ml-2">{q.answer}</span></div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-10 flex justify-center border-t border-white/10 pt-8">
+                  {!submitted ? (
+                    <button 
+                      onClick={() => setSubmitted(true)}
+                      disabled={answers.includes("")}
+                      className="px-10 py-4 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full font-bold text-lg transition-all shadow-[0_0_20px_rgba(99,102,241,0.4)] flex items-center"
+                    >
+                      <Check className="mr-2" /> Tekshirish
+                    </button>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                       <div className="text-3xl font-bold text-white mb-6">Natija: <span className="text-green-400 mx-2">{calculateScore()}</span> / {fillBlanksQuestions.length}</div>
+                       <button onClick={reset} className="px-8 py-3 bg-white/20 hover:bg-white/30 text-white rounded-full font-bold transition-colors flex items-center">
+                         <RotateCcw size={20} className="mr-2" /> Qayta urinib ko'rish
+                       </button>
                     </div>
-                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const App = () => {
+          const [activeTab, setActiveTab] = useState('flashcards');
+
+          return (
+            <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-indigo-950 to-slate-900 font-sans text-slate-100 selection:bg-indigo-500/30 overflow-x-hidden">
+              
+              {/* Decorative Background Elements */}
+              <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-600/20 blur-[120px] pointer-events-none"></div>
+              <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/20 blur-[120px] pointer-events-none"></div>
+
+              <div className="container mx-auto px-4 py-8 relative z-10">
+                
+                {/* Header */}
+                <header className="text-center mb-12">
+                  <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-white to-purple-200 mb-4 drop-shadow-sm">
+                    昨天下雪了
+                  </h1>
+                  <p className="text-xl md:text-2xl text-indigo-200 font-medium tracking-wide">
+                    Dilfuza Kāng lǎo shī bilan xitoy tilini o'rganmiz
+                  </p>
                 </header>
 
-                <main className="max-w-5xl mx-auto p-3 sm:p-4">
-                    
-                    {activeTab === 'learn' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                        
-                        {/* Sidebar */}
-                        <div className="lg:col-span-1 space-y-3 lg:sticky lg:top-24 h-fit">
-                        <h2 className="text-base sm:text-lg font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                            <Layout size={18} /> 课程列表 (Mavzular)
-                        </h2>
-                        <div className="flex flex-col gap-2">
-                            {LESSONS.map(lesson => (
-                            <button
-                                key={lesson.id}
-                                onClick={() => {
-                                setCurrentLessonId(lesson.id);
-                                setCurrentExampleIndex(0);
-                                }}
-                                className={`w-full text-left p-3 sm:p-4 rounded-xl border transition-all duration-200 group ${
-                                currentLessonId === lesson.id 
-                                    ? 'bg-blue-600 border-blue-600 text-white shadow-md transform scale-[1.01]' 
-                                    : 'bg-white border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700'
-                                }`}
-                            >
-                                <div className={`font-bold text-base sm:text-lg mb-1 ${currentLessonId === lesson.id ? 'text-white' : 'text-slate-800'}`}>
-                                {lesson.title.cn}
-                                </div>
-                                <div className={`text-xs sm:text-sm ${currentLessonId === lesson.id ? 'text-blue-100' : 'text-slate-500'}`}>
-                                {lesson.title.uz}
-                                </div>
-                            </button>
-                            ))}
-                        </div>
-                        
-                        <div className="bg-indigo-50 border border-indigo-100 p-3 sm:p-4 rounded-xl mt-4">
-                            <h3 className="font-bold text-indigo-800 text-xs sm:text-sm mb-2 flex items-center gap-2">
-                            <GitMerge size={14}/> 本课结构 (Qurilish)
-                            </h3>
-                            <ul className="text-[10px] sm:text-xs space-y-2 text-indigo-700 font-mono font-semibold">
-                            {currentLesson.structures.map((s, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                <span className="bg-indigo-200 text-indigo-800 px-1.5 rounded min-w-[1.2em] text-center flex-shrink-0">{i + 1}</span>
-                                <span className="break-words">{s}</span>
-                                </li>
-                            ))}
-                            </ul>
-                        </div>
-                        </div>
-
-                        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-                        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 border-b border-slate-100 pb-4 gap-2">
-                            <div>
-                                <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] sm:text-xs font-bold mb-1 sm:mb-2">Lesson {currentLesson.id}</span>
-                                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">{currentLesson.title.cn}</h2>
-                                <h3 className="text-sm sm:text-lg text-slate-500">{currentLesson.title.uz}</h3>
-                            </div>
-                            </div>
-
-                            <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
-                            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-1 rounded truncate max-w-[60%]">
-                                {currentExample.structureType}
-                            </span>
-                            <button 
-                                onClick={() => setCurrentExampleIndex(prev => (prev + 1) % currentLesson.examples.length)}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg font-medium text-xs sm:text-sm transition ml-auto"
-                            >
-                                <RefreshCw size={14} /> <span className="hidden sm:inline">下一个例子</span> (Keyingi)
-                            </button>
-                            </div>
-                            
-                            {/* Scrollable Container for Mobile SVG */}
-                            <div className="w-full aspect-[4/3] sm:aspect-[2/1] bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200 overflow-hidden relative shadow-inner overflow-x-auto touch-pan-x">
-                            <GrammarTree example={currentExample} animate={animateDiagram} />
-                            <div className="absolute bottom-2 right-2 text-[10px] text-slate-400 sm:hidden pointer-events-none bg-white/50 px-2 rounded">↔ Surish (Scroll)</div>
-                            </div>
-
-                            <div className="mt-4 sm:mt-6 text-center">
-                            <p className="text-xl sm:text-2xl font-bold text-slate-800 tracking-wide mb-1">{currentExample.chars.join(" ")}</p>
-                            <p className="text-base sm:text-lg text-blue-600 font-medium">{currentExample.uzbek}</p>
-                            </div>
-
-                            <div className="mt-6 sm:mt-8 flex flex-wrap gap-2 justify-center text-[10px] sm:text-xs">
-                            {Object.entries(GRAMMAR_TERMS).map(([key, val]) => (
-                                <div key={key} className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-slate-100 bg-white shadow-sm">
-                                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full" style={{backgroundColor: val.color}}></div>
-                                <span className="text-slate-600 font-medium">{val.cn}</span>
-                                <span className="text-slate-400 border-l pl-1.5 ml-0.5">{val.uz}</span>
-                                </div>
-                            ))}
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    )}
-
-                    {activeTab === 'practice' && (
-                    <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
-                        <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-lg border border-slate-200 text-center relative overflow-hidden">
-                            <h2 className="text-lg sm:text-2xl font-bold mb-2">构造句子 (Gap tuzish)</h2>
-                            <p className="text-sm sm:text-base text-slate-500 mb-6 sm:mb-8">尝试造句：<br/><strong>他跑得不快</strong> (Tasdiq, Inkor yoki Solishtirish)</p>
-                            
-                            {/* Mobile-friendly construction area */}
-                            <div className="min-h-[100px] sm:min-h-[140px] bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-3 sm:p-6 mb-6 sm:mb-8 transition-colors hover:border-blue-300">
-                            {practiceSentence.length === 0 ? (
-                                <div className="text-slate-400 flex flex-col items-center gap-2">
-                                <MousePointer2 size={24} className="opacity-50 sm:w-8 sm:h-8" />
-                                <span className="text-xs sm:text-base">点击下方词语开始造句<br/>(So'zlarni tanlang)</span>
-                                </div>
-                            ) : (
-                                practiceSentence.map((word, idx) => (
-                                <button 
-                                    key={word.uniqueId} 
-                                    onClick={() => removeFromPractice(word.uniqueId)}
-                                    className="animate-in fade-in zoom-in duration-200 active:scale-95 transition-transform"
-                                >
-                                    <div 
-                                    className="px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl shadow-md border-b-4 text-white font-bold text-base sm:text-xl flex flex-col items-center min-w-[50px] sm:min-w-[70px]"
-                                    style={{backgroundColor: word.color, borderColor: 'rgba(0,0,0,0.2)'}}
-                                    >
-                                    {word.char}
-                                    <span className="text-[8px] sm:text-[10px] opacity-90 font-normal uppercase tracking-wider mt-0.5">{word.role}</span>
-                                    </div>
-                                </button>
-                                ))
-                            )}
-                            </div>
-
-                            <div className="flex justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-                            <button 
-                                onClick={clearPractice}
-                                className="px-4 py-2 sm:px-6 sm:py-2.5 text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-xl transition font-medium text-sm sm:text-base"
-                            >
-                                清除 (Tozalash)
-                            </button>
-                            <button 
-                                className="px-5 py-2 sm:px-8 sm:py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg shadow-green-200 transition flex items-center gap-2 transform active:scale-95 text-sm sm:text-base"
-                                onClick={checkSentence}
-                            >
-                                <CheckCircle size={18} className="sm:w-5 sm:h-5" /> 检查 (Tekshirish)
-                            </button>
-                            </div>
-
-                            {/* Feedback Display Area */}
-                            {feedback && (
-                            <div className={`mb-6 sm:mb-8 p-3 sm:p-4 rounded-xl flex items-start gap-3 sm:gap-4 text-left animate-in fade-in slide-in-from-top-2 ${
-                                feedback.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
-                            }`}>
-                                <div className={`mt-1 p-1.5 sm:p-2 rounded-full ${feedback.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                {feedback.type === 'success' ? <CheckCircle size={20} className="sm:w-6 sm:h-6" /> : <XCircle size={20} className="sm:w-6 sm:h-6" />}
-                                </div>
-                                <div>
-                                <h4 className={`font-bold text-sm sm:text-lg ${feedback.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
-                                    {feedback.msgCn}
-                                </h4>
-                                <p className={`text-xs sm:text-base ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {feedback.msgUz}
-                                </p>
-                                </div>
-                            </div>
-                            )}
-
-                            <div className="border-t border-slate-100 pt-6 sm:pt-8">
-                            <h3 className="text-xs sm:text-sm font-bold text-slate-400 uppercase mb-3 sm:mb-4 tracking-widest text-left">词库 (So'z banki)</h3>
-                            {/* Mobile optimized grid for words */}
-                            <div className="grid grid-cols-4 sm:flex sm:flex-wrap gap-2 sm:gap-3 justify-center">
-                                {practiceWords.map(word => (
-                                <button
-                                    key={word.id}
-                                    onClick={() => addToPractice(word)}
-                                    className="group relative px-2 py-2 sm:px-5 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md hover:border-blue-400 active:bg-blue-50 transition text-center sm:text-left min-w-0 sm:min-w-[90px]"
-                                >
-                                    {/* Dot only visible on larger screens or positioned differently */}
-                                    <div className="hidden sm:flex justify-between items-start mb-1">
-                                        <div className="w-2 h-2 rounded-full" style={{backgroundColor: word.color}}></div>
-                                    </div>
-                                    <div className="font-bold text-slate-800 text-lg sm:text-2xl group-hover:text-blue-600">{word.char}</div>
-                                    <div className="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1 truncate">{word.pinyin}</div>
-                                    {/* Mobile dot indicator */}
-                                    <div className="sm:hidden w-1.5 h-1.5 rounded-full absolute top-1 right-1" style={{backgroundColor: word.color}}></div>
-                                </button>
-                                ))}
-                            </div>
-                            </div>
-                        </div>
-                    </div>
-                    )}
-                </main>
+                {/* Navigation */}
+                <div className="flex justify-start md:justify-center overflow-x-auto pb-4 mb-10 hide-scrollbar space-x-2">
+                  <TabButton active={activeTab === 'flashcards'} onClick={() => setActiveTab('flashcards')} icon={BookOpen} label="Fleshkartalar" />
+                  <TabButton active={activeTab === 'vocabQuiz'} onClick={() => setActiveTab('vocabQuiz')} icon={Activity} label="Lug'at Testi" />
+                  <TabButton active={activeTab === 'dialogues'} onClick={() => setActiveTab('dialogues')} icon={MessageCircle} label="Muloqot" />
+                  <TabButton active={activeTab === 'grammar'} onClick={() => setActiveTab('grammar')} icon={FileText} label="Grammatika" />
+                  <TabButton active={activeTab === 'grammarQuiz'} onClick={() => setActiveTab('grammarQuiz')} icon={Award} label="Grammatika Testi" />
+                  <TabButton active={activeTab === 'fillBlanks'} onClick={() => setActiveTab('fillBlanks')} icon={Edit3} label="So'zlarni to'ldirish" />
                 </div>
-            );
+
+                {/* Main Content Area */}
+                <main className="min-h-[60vh] animate-fade-in pb-20">
+                  {activeTab === 'flashcards' && <Flashcards />}
+                  {activeTab === 'vocabQuiz' && <Quiz questions={vocabQuizQuestions} title="Lug'at Testi" />}
+                  {activeTab === 'dialogues' && <Dialogues />}
+                  {activeTab === 'grammar' && <Grammar />}
+                  {activeTab === 'grammarQuiz' && <Quiz questions={grammarQuizQuestions} title="Grammatika Testi" />}
+                  {activeTab === 'fillBlanks' && <FillInTheBlanks />}
+                </main>
+
+                {/* Footer */}
+                <footer className="fixed bottom-0 left-0 w-full bg-black/30 backdrop-blur-md border-t border-white/10 py-4 text-center z-50">
+                  <p className="text-white/60 text-sm font-medium">
+                    HSK 1 NEW3.0 - Lesson 12 &copy; 2026 Dilfuza Kāng lǎo shī (telegram@diffila)
+                  </p>
+                </footer>
+              </div>
+            </div>
+          );
         }
 
+        // Mount the application
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<ChineseGrammarApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
